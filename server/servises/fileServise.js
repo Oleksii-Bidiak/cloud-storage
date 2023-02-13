@@ -12,7 +12,7 @@ class FileServise {
 					fs.mkdirSync(filePath)
 					return resolve({ message: 'File was created' })
 				} else {
-					return resorejectlve({ message: 'File already exist' })
+					return reject({ message: 'File already exist' })
 				}
 			} catch (e) {
 				return reject({ message: 'File error', e })

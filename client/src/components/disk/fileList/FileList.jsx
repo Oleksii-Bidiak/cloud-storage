@@ -7,7 +7,6 @@ export const FileList = () => {
   const files = useSelector((state) => state.files.files).map((file) => (
     <File key={file._id} file={file} />
   ));
-
   return (
     <div className="filelist">
       <div className="filelist__header">

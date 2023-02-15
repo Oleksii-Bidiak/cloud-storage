@@ -15,7 +15,6 @@ export const File = ({ file }) => {
       dispatch(setCurrentDir(file._id));
     }
   };
-  console.log(file)
   return (
     <div className="file" onClick={() => openDirHandler(file)}>
       <img

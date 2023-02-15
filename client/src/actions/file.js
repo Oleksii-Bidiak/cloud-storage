@@ -41,6 +41,7 @@ export function uploadFile(file, dirId) {
 			if (dirId) {
 				formData.append('parent', dirId)
 			}
+			console.log(formData)
 			const response = await axios.post(`http://localhost:5000/api/files/upload`, formData, {
 				headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
 				onUploadProgress: progressEvent => {

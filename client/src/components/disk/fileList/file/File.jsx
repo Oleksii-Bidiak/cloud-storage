@@ -9,14 +9,15 @@ export const File = ({ file }) => {
   const dispatch = useDispatch();
   const currentDir = useSelector((state) => state.files.currentDir);
 
-  const openDirHandler = () => {
-    dispatch(pushToStack(currentDir));
-    dispatch(setCurrentDir(file._id));
+  const openDirHandler = (file) => {
+    if (file.type === "dir") {
+      dispatch(pushToStack(currentDir));
+      dispatch(setCurrentDir(file._id));
+    }
   };
+  console.log(file)
   return (
-    <div
-      className="file"
-      onClick={file.type === "dir" ? () => openDirHandler() : ""}>
+    <div className="file" onClick={() => openDirHandler(file)}>
       <img
         src={file.type === "dir" ? dirLogo : fileLogo}
         alt=""

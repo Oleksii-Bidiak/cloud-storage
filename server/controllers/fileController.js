@@ -1,8 +1,9 @@
-const fileServise = require('../servises/fileServise')
+const fileService = require('../services/fileService')
 const config = require('config')
 const fs = require('fs')
 const User = require('../models/User')
 const File = require('../models/File')
+
 
 class FileController {
 	async createDir(req, res) {
@@ -12,17 +13,15 @@ class FileController {
 			const parentFile = await File.findOne({ _id: parent })
 			if (!parentFile) {
 				file.path = name
-				await fileServise.createDir(file)
+				await fileService.createDir(file)
 			} else {
 				file.path = `${parentFile.path}\\${file.name}`
-				await fileServise.createDir(file)
+				await fileService.createDir(file)
 				parentFile.childs.push(file._id)
 				await parentFile.save()
 			}
-
 			await file.save()
 			return res.json(file)
-
 		} catch (e) {
 			console.log(e)
 			return res.status(400).json(e)
@@ -34,12 +33,12 @@ class FileController {
 			const files = await File.find({ user: req.user.id, parent: req.query.parent })
 			return res.json(files)
 		} catch (e) {
-			console.log(req.user)
+			console.log(e)
 			return res.status(500).json({ message: "Can not get files" })
 		}
 	}
 
-	async fileUpload(req, res) {
+	async uploadFile(req, res) {
 		try {
 			const file = req.files.file
 
@@ -47,10 +46,10 @@ class FileController {
 			const user = await User.findOne({ _id: req.user.id })
 
 			if (user.usedSpace + file.size > user.diskSpace) {
-				res.status(400).json({ message: "There no space on the disk" })
+				return res.status(400).json({ message: 'There no space on the disk' })
 			}
 
-			user.usedSpace += file.size
+			user.usedSpace = user.usedSpace + file.size
 
 			let path;
 			if (parent) {
@@ -60,9 +59,8 @@ class FileController {
 			}
 
 			if (fs.existsSync(path)) {
-				res.status(400).json({ message: "File already exist" })
+				return res.status(400).json({ message: 'File already exist' })
 			}
-
 			file.mv(path)
 
 			const type = file.name.split('.').pop()
@@ -84,26 +82,37 @@ class FileController {
 
 			res.json(dbFile)
 		} catch (e) {
-			console.log(req.user)
+			console.log(e)
 			return res.status(500).json({ message: "Upload error" })
 		}
 	}
 
 	async downloadFile(req, res) {
 		try {
-
 			const file = await File.findOne({ _id: req.query.id, user: req.user.id })
-			const path = config.get('filePath') + '\\' + req.user.id + '\\' + file.path
-			console.log(path)
+			const path = config.get('filePath') + '\\' + req.user.id + '\\' + file.path + '\\' + file.name
 			if (fs.existsSync(path)) {
 				return res.download(path, file.name)
 			}
-
 			return res.status(400).json({ message: "Download error" })
-
 		} catch (e) {
 			console.log(e)
 			res.status(500).json({ message: "Download error" })
+		}
+	}
+
+	async deleteFile(req, res) {
+		try {
+			const file = await File.findOne({ _id: req.query.id, user: req.user.id })
+			if (!file) {
+				return res.status(400).json({ message: 'file not found' })
+			}
+			fileService.deleteFile(file)
+			await file.remove()
+			return res.json({ message: 'File was deleted' })
+		} catch (e) {
+			console.log(e)
+			return res.status(400).json({ message: 'Dir is not empty' })
 		}
 	}
 }

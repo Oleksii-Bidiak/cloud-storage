@@ -79,7 +79,6 @@ class FileController {
 				user: user._id
 			});
 
-
 			await dbFile.save()
 			await user.save()
 
@@ -87,6 +86,24 @@ class FileController {
 		} catch (e) {
 			console.log(req.user)
 			return res.status(500).json({ message: "Upload error" })
+		}
+	}
+
+	async downloadFile(req, res) {
+		try {
+
+			const file = await File.findOne({ _id: req.query.id, user: req.user.id })
+			const path = config.get('filePath') + '\\' + req.user.id + '\\' + file.path
+			console.log(path)
+			if (fs.existsSync(path)) {
+				return res.download(path, file.name)
+			}
+
+			return res.status(400).json({ message: "Download error" })
+
+		} catch (e) {
+			console.log(e)
+			res.status(500).json({ message: "Download error" })
 		}
 	}
 }

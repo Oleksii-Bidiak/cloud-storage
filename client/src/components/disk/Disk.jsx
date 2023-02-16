@@ -5,6 +5,7 @@ import { setCurrentDir, setPopupDisplay } from "../../reducers/fileReducer";
 import "./disk.scss";
 import { FileList } from "./fileList/FileList";
 import Popup from "./Popup";
+import { Uploader } from "./uploader/Uploader";
 
 export const Disk = () => {
   const dispatch = useDispatch();
@@ -80,6 +81,7 @@ export const Disk = () => {
       </div>
       <FileList />
       <Popup />
+		<Uploader/>
     </div>
   ) : (
     <div

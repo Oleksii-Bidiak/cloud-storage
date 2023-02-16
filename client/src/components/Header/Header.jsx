@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Logo from "../../assets/img/logo.svg";
-import { logout } from "../../reducers/userReduxer";
+import { logout } from "../../reducers/userReducer";
 import "./header.scss";
 
 export const Header = () => {

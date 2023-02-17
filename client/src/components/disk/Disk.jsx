@@ -12,14 +12,19 @@ export const Disk = () => {
   const currentDir = useSelector((state) => state.files.currentDir);
   const dirStack = useSelector((state) => state.files.dirStack);
   const [dragEnter, setDragEnter] = useState(false);
+  const [sort, setSort] = useState("type");
 
   const showPopupHandler = () => {
     dispatch(setPopupDisplay("flex"));
   };
 
   useEffect(() => {
-    dispatch(getFiles(currentDir));
-  }, [currentDir]);
+    dispatch(getFiles(currentDir, sort));
+  }, [currentDir, sort]);
+
+  const changeSortType=(e)=>{
+	setSort(e.target.value)
+  }
 
   const backClickHandler = () => {
     const backDirId = dirStack.pop();
@@ -78,10 +83,18 @@ export const Disk = () => {
             className="disk__upload-input"
           />
         </div>
+        <select
+          className="dist__select"
+          value={sort}
+          onChange={(e) => changeSortType(e)}>
+          <option value="name">По імені</option>
+          <option value="type">По типу</option>
+          <option value="date">По даті</option>
+        </select>
       </div>
       <FileList />
       <Popup />
-		<Uploader/>
+      <Uploader />
     </div>
   ) : (
     <div

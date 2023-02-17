@@ -30,7 +30,9 @@ class FileController {
 
 	async getFiles(req, res) {
 		try {
-			const files = await File.find({ user: req.user.id, parent: req.query.parent })
+			const { sort } = req.query
+			const files = await File.find({ user: req.user.id, parent: req.query.parent }).sort({ [sort]: 1 })
+
 			return res.json(files)
 		} catch (e) {
 			console.log(e)
@@ -53,9 +55,9 @@ class FileController {
 
 			let path;
 			if (parent) {
-				path = `${config.get('filePath')}\\${user._id}\\${parent.path}\\${file.name}`
+				path = `${config.get('filePath')}\\${user._id}\\${parent.path}\\${file.name.trim()}`
 			} else {
-				path = `${config.get('filePath')}\\${user._id}\\${file.name}`
+				path = `${config.get('filePath')}\\${user._id}\\${file.name.trim()}`
 			}
 
 			if (fs.existsSync(path)) {
@@ -64,12 +66,12 @@ class FileController {
 			file.mv(path)
 
 			const type = file.name.split('.').pop()
-			let filePath = file.name
+			let filePath = file.name.trim()
 			if (parent) {
-				filePath = parent.path + "\\" + file.name
+				filePath = parent.path + "\\" + file.name.trim()
 			}
 			const dbFile = new File({
-				name: file.name,
+				name: file.name.trim(),
 				type,
 				size: file.size,
 				path: filePath,
